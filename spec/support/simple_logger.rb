@@ -10,19 +10,19 @@ module SimpleLogger
     {
       before: :info,
       after: :info,
-      arround:(options[:return_type].eql?(:success) ? :info : :error)
-    }
+      around:(options[:return_type].eql?(:success) ? :info : :error)
+    }[options[:type]]
   end
 
   def build_message_for(*args, options, &block)
     proc = block_given? ? Proc.new : nil
     description = {
-      before: "will be called with args #{args} and block/proc #{proc}",
+      before: "will be called with args #{args} and block/proc #{proc ? proc : 'nil'}",
       after: "was called with args #{args} and block/proc #{proc}",
       around: "returned #{options[:return_type]} with: #{options[:return_object]}"
-    }
+    }[options[:type]]
 
-    "[#{options[:class]}##{options[:target]}] #{description}"
+    "#{options[:class]}##{options[:target]} #{description}"
   end
 
   def write_log(level, message)

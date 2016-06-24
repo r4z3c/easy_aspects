@@ -8,7 +8,7 @@ class SomeClass
   class << self
 
     def a_singleton_method(some_arg)
-      message = "an_singleton_method #{some_arg}"
+      message = "a_singleton_method #{some_arg}"
       puts message or message
     end
 
