@@ -1,13 +1,5 @@
 require 'easy_aspects/loader'
+require 'easy_callbacks'
 
 module EasyAspects
-
-  class << self
-
-    def open(concern)
-      Aspect.new concern
-    end
-
-  end
-
 end
