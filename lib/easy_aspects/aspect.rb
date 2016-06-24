@@ -6,24 +6,21 @@ module EasyAspects
     attr_accessor :concern, :advices, :stages, :pointcuts
 
     STAGES = [:before, :around, :after]
-    ADVICES_TYPES = [String, Symbol, Regexp]
 
-    def initialize(concern)
-      self.concern = concern
+    def initialize(concern_module)
+      self.concern = Concern.new(concern_module)
       self.advices = []
       self.stages = []
       self.pointcuts = []
-
-      validate_concern!
+      @state = :open
     end
 
-    def apply_advice(advice)
-      apply_advices advice
+    def set_advice(advice)
+      set_advices advice
     end
 
-    def apply_advices(*advices)
-      self.advices = advices
-      validate_advices!
+    def set_advices(*advices)
+      self.advices += advices.map { |advice| Advice.new advice }
       self
     end
 
@@ -61,20 +58,15 @@ module EasyAspects
       @state.eql? :closed
     end
 
+    def apply_concern_to(object)
+      Applier.new self, object
+    end
+
     private
-
-    def validate_concern!
-      raise 'you are doing it wrong: concern must be a module' unless concern.is_a? Module
-    end
-
-    def validate_advices!
-      diff = self.advices.map(&:class) - ADVICES_TYPES
-      raise "you are doing it wrong: advices must be of type: #{ADVICES_TYPES}" if diff.any?
-    end
 
     include ::EasyCallbacks::Base
 
-    %w(apply_advices at_all_stages before around after of close).each do |method|
+    %w(set_advices at_all_stages before around after of close).each do |method|
       before method, :validate_state!
     end
 
